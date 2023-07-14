@@ -62,7 +62,9 @@ export const createNewUser = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/users/signin
 // @access  public
 export const signIn = expressAsyncHandler(async (req, res) => {
+  console.log("server >>signIn");
   const { name, password } = req.body;
+  console.log(password.toString());
 
   if (!name || !password) {
     res.status(400);
@@ -71,7 +73,7 @@ export const signIn = expressAsyncHandler(async (req, res) => {
   console.log("signIn");
   const user = await User.findOne({ name });
   console.log("signIn");
-  if (user && (await user.matchPassword(password))) {
+  if (user && (await user.matchPassword(password.toString()))) {
     generateToken(res, user._id);
     const userData = {
       _id: user._id,
@@ -87,6 +89,7 @@ export const signIn = expressAsyncHandler(async (req, res) => {
   }
 });
 export const logoutUser = (req, res) => {
+  console.log("server >>logout");
   res.cookie("jwt", "", { httpOnly: true, expires: new Date(0) });
 
   res.status(200).json({ status: "success", message: "Logout successfully!." });

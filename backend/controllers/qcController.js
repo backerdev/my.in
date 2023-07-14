@@ -1,11 +1,12 @@
 import expressAsyncHandler from "express-async-handler";
 import PurchaseOrder from "../models/purchase.js";
 import Storage from "../models/storage.js";
-
+const labArray = ["Pending", "NY", "Pass", "Fail"];
 export const getAllQcPo = expressAsyncHandler(async (req, res) => {
-  const awaitingPo = await PurchaseOrder.find({ "grn.isWeight": true }).select(
-    "poNumber _id name weight"
-  );
+  const awaitingPo = await PurchaseOrder.find({
+    "grn.isWeight": true,
+    // "grn.labResult": { $ne: "Pass" },
+  }).select("poNumber _id name weight grn.labResult");
 
   res.json({ awaitingPo });
 });
@@ -13,7 +14,11 @@ export const updateGrnPo = expressAsyncHandler(async (req, res) => {
   const { id, labTest } = req.body;
 
   const poDetails = await PurchaseOrder.findById(id);
-
+  console.log(req.body);
+  if (!labArray.includes(labTest)) {
+    res.status(404);
+    throw new Error("Invalid Lab Result");
+  }
   if (!id || !poDetails) {
     res.status(404);
     throw new Error("Invalid id");
@@ -44,9 +49,12 @@ export const updateGrnPo = expressAsyncHandler(async (req, res) => {
   }
 
   await poDetails.save();
-  res
-    .status(200)
-    .json({ status: "success", message: "Updated successfully!." });
+
+  res.status(200).json({
+    status: "success",
+
+    message: "Updated successfully!.",
+  });
 });
 
 export const deletePO = expressAsyncHandler(async (req, res) => {

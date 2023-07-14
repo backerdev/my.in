@@ -55,7 +55,7 @@ export const batchChemical = expressAsyncHandler(async (req, res) => {
     mgd: mgd,
     startBatch: calculate,
     totalDuration: convertMsToTime(
-      calculate - newArray[newArray.length - 1].startBatch.getTime() ||
+      calculate - newArray[newArray.length - 1]?.startBatch.getTime() ||
         calculate.getTime() - duration
     ),
     weight: weight,
